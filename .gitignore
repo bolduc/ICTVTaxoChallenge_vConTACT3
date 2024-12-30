@@ -1,0 +1,24 @@
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Packaging
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+dist/
+build/
+__pycache__/
+
+# Mac
+.DS_Store
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
