@@ -1,0 +1,32 @@
+BootStrap: debootstrap
+OSVersion: bionic
+MirrorURL: http://us.archive.ubuntu.com/ubuntu/
+
+%environment
+    export PATH=/mmseqs/bin/:/mambaforge/bin/:$PATH
+
+%runscript
+    exec vcontact3 "$@"
+
+%post
+    apt-get update && apt-get install -y automake build-essential bzip2 wget git unzip curl libgl1
+
+    export PATH=/mambaforge/bin/:$PATH
+
+    wget https://github.com/conda-forge/miniforge/releases/download/24.3.0-0/Mambaforge-24.3.0-0-Linux-x86_64.sh
+    bash Mambaforge-24.3.0-0-Linux-x86_64.sh -b -f -p /mambaforge/
+
+    . /mambaforge/etc/profile.d/conda.sh  # Only activates conda, but don't need to "activate base"
+    mamba install -y -c bioconda conda-build vcontact3
+
+    # If latest version absolutely necessary
+    git clone https://bitbucket.org/MAVERICLab/vcontact3.git
+    cd vcontact3 && python -m pip install . --no-deps
+
+    cd / && wget https://mmseqs.com/latest/mmseqs-linux-sse2.tar.gz && tar xzf mmseqs-linux-sse2.tar.gz && export PATH=/mmseqs/bin/:$PATH
+
+    # Setting version to 223 to ensure consistency between runs, but "latest" will retrieve the latest DB available
+    vcontact3 prepare_databases --get-version "223" --set-location /v3_databases/
+
+    # Clean stuff up to reduce disk space
+    apt-get clean && conda build purge-all && cd / && rm Mambaforge-24.3.0-0-Linux-x86_64.sh
