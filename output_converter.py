@@ -48,5 +48,13 @@ results_df = pd.concat([template_df, v3_result_df], ignore_index=True)
 # Reorder cuz it's annoying
 results_df = results_df[template_df.columns]
 
+# To keep with ICTV challenge, need to void naming for any discrepency in nomenclature
+# | = merged groups
+# novel = newly defined groups
+# _of_ = catchall of new groups
+patterns = r".*(\||_of_|novel).*"
+results_df = results_df.replace(to_replace=patterns, value="NA", regex=True)
+results_df = results_df.replace(to_replace='No Realm', value="NA", regex=True)
+
 # Save
 results_df.to_csv(root_dir / 'results/classification_results.csv', index=False)
